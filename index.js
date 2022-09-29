@@ -24,7 +24,7 @@ app.get("/api/hello", function (req, res) {
   res.json({greeting: 'hello API'});
 });
 
-app.get('/api/:date', (req, res) => {
+app.get('/api/:date?', (req, res) => {
 
   if (/[0-9]{4}-[0-9]{2}-[0-9]{2}/.test(req.params.date)) {
     let dateObj = new Date(req.params.date);
@@ -36,10 +36,10 @@ app.get('/api/:date', (req, res) => {
     let utc = new Date(unixDate);
     let utcDate = utc.toUTCString();
     res.send({unix: unixDate, 'utc': utcDate});
-  } else if (req.params.date === "") {
-    let dateObj = Date.now();
-    utcDate = dateObj.toUTCString();
-    unixDate = dateObj.getTime();
+  } else if (!req.params.date) {
+    let now = new Date();
+    unixDate = now.getTime();
+    utcDate = now.toUTCString();
     res.send({unix: unixDate, 'utc': utcDate});
   } else {
     res.send({ error : "Invalid Date" })
