@@ -26,24 +26,38 @@ app.get("/api/hello", function (req, res) {
 
 app.get('/api/:date?', (req, res) => {
 
-  if (/[0-9]{4}-[0-9]{2}-[0-9]{2}/.test(req.params.date)) {
+  if (/^\d+\s\w+\s\w+\s\w+\W\w+\W\w+\s\w+/.test(req.params.date)) {
+    
+    let unixDate = Date.parse(req.params.date);
+    let utc = new Date(unixDate);
+    let utcDate = utc.toUTCString();
+    res.send({unix: unixDate, utc: utcDate});
+    
+  } else if (/[0-9]{4}-[0-9]{2}-[0-9]{2}/.test(req.params.date)) {
+    
     let dateObj = new Date(req.params.date);
     let utcDate = dateObj.toUTCString();
     let unixDate = dateObj.getTime();
-    res.send({unix: unixDate, 'utc': utcDate});
-  } else if (/[0-9]+/.test(req.params.date)){
+    res.send({unix: unixDate, utc: utcDate});
+
+  } else if (/[0-9]+/.test(req.params.date)) {
+    
     let unixDate = parseInt(req.params.date);
     let utc = new Date(unixDate);
     let utcDate = utc.toUTCString();
-    res.send({unix: unixDate, 'utc': utcDate});
+    res.send({unix: unixDate, utc: utcDate});
+
   } else if (!req.params.date) {
+    
     let now = new Date();
     unixDate = now.getTime();
     utcDate = now.toUTCString();
-    res.send({unix: unixDate, 'utc': utcDate});
+    res.send({unix: unixDate, utc: utcDate});
+
   } else {
     res.send({ error : "Invalid Date" })
   }
+
 })
 
 
