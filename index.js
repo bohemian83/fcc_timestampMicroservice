@@ -25,41 +25,23 @@ app.get("/api/hello", function (req, res) {
 });
 
 app.get('/api/:date?', (req, res) => {
-
-  if (/\d+\s\w+\s\w+\s\w+\W\w+\W\w+\s\w+/.test(req.params.date)) {
-    
-    let unixDate = Date.parse(req.params.date);
-    let utc = new Date(unixDate);
-    let utcDate = utc.toUTCString();
-    res.send({unix: unixDate, utc: utcDate});
-    
-  }  else if (/[0-9]{4}-[0-9]{2}-[0-9]{2}/.test(req.params.date)) {
-    
-    let dateObj = new Date(req.params.date);
-    let utcDate = dateObj.toUTCString();
-    let unixDate = dateObj.getTime();
-    res.send({unix: unixDate, utc: utcDate});
-
-  } else if (/[0-9]+/.test(req.params.date)) {
-    
-    let unixDate = parseInt(req.params.date);
-    let utc = new Date(unixDate);
-    let utcDate = utc.toUTCString();
-    res.send({unix: unixDate, utc: utcDate});
-
-  } else if (!req.params.date) {
-    
-    let now = new Date();
-    unixDate = now.getTime();
-    utcDate = now.toUTCString();
-    res.send({unix: unixDate, utc: utcDate});
-
+  
+  let unixDate = Date.parse(req.params.date)
+  console.log(req.params.date, Date.parse(req.params.date))
+  if (isNaN(unixDate)) {
+    if (!req.params.date) {
+      now = new Date();
+      return res.send({ unix: now.getTime(), utc: now.toUTCString() })
+    } else if ((/([a-z]|-)+/).test(req.params.date)) {
+      return res.send({ error: 'Invalid Date'})
+    } else {
+      let dateObj = new Date(parseInt(req.params.date));
+      return res.send({ unix: parseInt(req.params.date), utc: dateObj.toUTCString() })
+    }  
   } else {
-    res.send({ error : "Invalid Date" })
+    return res.send({ unix: unixDate, utc: new Date(unixDate).toUTCString() })
   }
 })
-
-
 
 // listen for requests :)
 var listener = app.listen(process.env.PORT, function () {
